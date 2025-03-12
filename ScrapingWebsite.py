@@ -8,16 +8,16 @@ from urllib.parse import urljoin
 
 def scrape_diegowritesa_blog():
     url = "[ChooseYourURLHERE]"
-    headers = {"User-Agent": "Mozilla/5.0"}
+    headers = {"User-Agent": "Mozilla/5.0"} # Or any agent you want, watch out to not get blocked by the website or detected as malicious activity
     
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url, headers=headers)  # Use requests or anything you want to do the web request
         response.raise_for_status()
         
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.text, "html.parser")  # Create the soup
         
         # Extract the first link with [CTI] in the text
-        cti_links = [urljoin(url, a["href"]) for a in soup.find_all("a", href=True) if "[CTI]" in a.get_text()]
+        cti_links = [urljoin(url, a["href"]) for a in soup.find_all("a", href=True) if "[CTI]" in a.get_text()]  # Find my tag, change this to however your link looks like
         
         if cti_links:
             print(f"Extracted CTI Links: {cti_links[0]}")  # Debugging (only print the first link)
@@ -79,7 +79,7 @@ def scrape_cti_data(url):
     
     return data
 
-def save_to_csv(data, filename="cti_links_data_first_url.csv"):
+def save_to_csv(data, filename="cti_links_url.csv"):
     with open(filename, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow(["URL", "Hashes", "IPs", "Domains", "Full Content"])
