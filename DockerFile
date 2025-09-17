@@ -1,0 +1,42 @@
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /workspace
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Explicitly copy all necessary files
+COPY config.py .
+COPY classifier.py .
+COPY ingest.py .
+COPY generation.py .
+COPY rag.py .
+COPY app.py .
+# Note: .env is mounted via docker-compose; no need to copy into image
+
+# Create data directories
+RUN mkdir -p /workspace/data/raw /workspace/data/chroma /workspace/data/.cache/huggingface
+
+# Debug: List copied files
+RUN ls -l /workspace
+
+# Create non-root user for security
+RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /workspace
+USER appuser
+
+# Expose port
+EXPOSE 7860
+
+# Default command
+CMD ["python", "app.py"]
